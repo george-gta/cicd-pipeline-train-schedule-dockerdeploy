@@ -34,5 +34,14 @@ pipeline {
                 }
             }
         }
-    }
-}
+        stage('DeployToProduction') {
+            when {
+                branch 'master'
+            }
+            steps {
+                input 'Deploy to Production?'
+                milestone(1)
+                withCredentials([usernamePassword(credentialsID: 'webserver_login', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')
+                                 script {
+                                     sh "sshpass -p 'USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker pull georgiplamenov/train-schedule\""
+                                     
